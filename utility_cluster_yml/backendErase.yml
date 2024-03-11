@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: backend-microservice
+  labels:
+    app: mern-backend
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: mern-backend
+  template:  
+    metadata:
+      labels: 
+        app: mern-backend
+    spec:      
+      containers:
+        - name: mern-backend
+          image: crimson2022/backend:1.0  
+          ports: 
+            - containerPort: 5000

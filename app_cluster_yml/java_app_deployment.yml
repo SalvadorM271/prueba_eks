@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: backend-microservice
+  labels:
+    app: java-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: java-backend
+  template:  
+    metadata:
+      labels: 
+        app: java-backend
+    spec:      
+      containers:
+        - name: java-backend
+          image: 438555236323.dkr.ecr.us-east-1.amazonaws.com/prueba_tecnica  
+          ports: 
+            - containerPort: 8080
