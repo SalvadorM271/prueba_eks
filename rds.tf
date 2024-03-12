@@ -39,6 +39,12 @@ resource "aws_db_subnet_group" "rds_eks" {
     aws_subnet.private-us-east-1b.id]
 }
 
+resource "aws_kms_key" "db_key" {
+  description         = "KMS key for RDS Postgres"
+  key_usage           = "ENCRYPT_DECRYPT"
+  enable_key_rotation = true
+}
+
 
 
 // --------------------------------RDS database------------------------------
@@ -52,10 +58,16 @@ resource "aws_db_instance" "rds" {
   instance_class          = var.rds_instance // db.t2.micro
   allocated_storage       = 20
   storage_type            = var.rds_storage_type // gp2
+  storage_encrypted       = true
+  kms_key_id              = aws_kms_key.db_key.arn
   username                = var.sonar_db_username
   password                = var.sonar_db_password
   publicly_accessible     = false
-  skip_final_snapshot     = true // will add later
+  backup_retention_period = 30
+  backup_window           = "21:00-23:00"
+  maintenance_window      = "Sun:00:00-Sun:03:00"
+  skip_final_snapshot     = false 
+  final_snapshot_identifier = "${var.project_name}-rds-final-snapshot2-${var.environment}"
   vpc_security_group_ids  = [aws_security_group.rds_sg[0].id]
   db_subnet_group_name    = aws_db_subnet_group.rds_eks[0].name
 }

@@ -33,28 +33,7 @@ resource "aws_security_group" "efs_sg" {
   
 }
 
-// create local to avoid repetition of mount code (only add subnets were node group is deploy)
 
-# locals {
-#   count = var.project_name == "utility-cluster" ? 1 : 0
-#   subnet_ids = [
-#     aws_subnet.private-us-east-1a.id,
-#     aws_subnet.private-us-east-1b.id,
-#   ]
-# }
-
-// mounts efs on each worker node on the node group, this is what worked for me
-
-# resource "aws_efs_mount_target" "efs_vol" {
-#   count           = length(local.subnet_ids) // result of count is 2 so two resources are created
-#   file_system_id  = aws_efs_file_system.efs_vol.id
-#   subnet_id       = local.subnet_ids[count.index] // loops through every subnet
-#   security_groups = [aws_security_group.efs_sg.id]
-
-#   depends_on = [
-#     aws_eks_node_group.private-nodes, aws_efs_file_system.efs_vol
-#   ] 
-# }
 
 resource "aws_efs_mount_target" "efs_vol_a" {
   count = var.project_name == "utility-cluster" ? 1 : 0
@@ -96,6 +75,25 @@ resource "kubernetes_storage_class" "efs_jenkins" {
   }
 }
 
+// attach volume to a deployment with yml files using kubectl
+
+# resource "kubernetes_persistent_volume_claim" "jenkins_pvc" {
+#   count = var.project_name == "utility-cluster" ? 1 : 0
+#   metadata {
+#     name = "jenkins-pvc"
+#   }
+
+#   spec {
+#     access_modes = ["ReadWriteOnce"]
+#     resources {
+#       requests = {
+#         storage = "5Gi" // Set the desired storage size
+#       }
+#     }
+#     storage_class_name = kubernetes_storage_class.efs_jenkins[0].metadata[0].name
+#   }
+# }
+
 // dont forget to set the service type to NodePort in the values
 
 resource "helm_release" "jenkins" {
@@ -103,7 +101,7 @@ resource "helm_release" "jenkins" {
   name       = "jenkins"
   repository = "https://charts.jenkins.io"
   chart      = "jenkins"
-  version    = "5.1.0"
+  version    = "5.0.1"
 
   values = [
     "${file("jenkins-values.yaml")}"

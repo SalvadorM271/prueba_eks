@@ -906,9 +906,9 @@ agent:
   jnlpregistry:
   image:
     # -- Repository to pull the agent jnlp image from
-    repository: "jenkins/inbound-agent"
+    repository: "crimson2022/custom_agent"
     # -- Tag of the image to pull
-    tag: "3206.vb_15dcf73f6a_9-3"
+    tag: "latest"
   # -- Configure working directory for default agent
   workingDir: "/home/jenkins/agent"
   nodeUsageMode: "NORMAL"

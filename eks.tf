@@ -28,7 +28,7 @@ resource "aws_iam_role_policy_attachment" "eks-cluster-pol-attachment" {
 resource "aws_eks_cluster" "eks-cluster" {
   name     = "${var.project_name}-eks-cluster-${var.environment}"
   role_arn = aws_iam_role.eks-cluster-rol.arn
-  # version  = "1.28" // 1.29 version does not work with sonarqube
+  version  = "1.23" 
 
   vpc_config {
     subnet_ids = [
@@ -83,6 +83,21 @@ resource "aws_iam_role_policy_attachment" "nodes-AmazonEC2ContainerRegistryReadO
 
 // managed nodes configuration (worker nodes)
 
+resource "aws_launch_template" "add_bridge" {
+  name_prefix   = "example"
+  image_id      = "ami-09dc4a865b5b83bc7"
+  instance_type = var.instance_type
+
+  user_data = base64encode(
+    templatefile("${path.module}/user_data.sh", {
+      cluster_name = aws_eks_cluster.eks-cluster.name
+      endpoint     = aws_eks_cluster.eks-cluster.endpoint
+      ca_cert      = aws_eks_cluster.eks-cluster.certificate_authority[0].data
+      bootstrap_extra_args = "--enable-docker-bridge"
+    })
+  )
+}
+
 resource "aws_eks_node_group" "private-nodes" {
   cluster_name    = aws_eks_cluster.eks-cluster.name
   node_group_name = "${var.project_name}-private-nodes-${var.environment}"
@@ -94,12 +109,16 @@ resource "aws_eks_node_group" "private-nodes" {
   ]
 
   capacity_type  = var.instance_mode // ON_DEMAND
-  instance_types = [var.instance_type] // t3.small
 
   scaling_config {
     desired_size = 4
     max_size     = 10
     min_size     = 1 
+  }
+
+   launch_template {
+    id      = aws_launch_template.add_bridge.id
+    version = aws_launch_template.add_bridge.latest_version
   }
 
   // during an update to the worker nodes (EC2) only one can be unavailable at a time
