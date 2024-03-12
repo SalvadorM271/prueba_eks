@@ -21,12 +21,19 @@ To deploy utility cluster run:
 
 ```terraform apply```
 
+```aws eks --region us-east-1  update-kubeconfig --name utility-cluster-eks-cluster-dev```
+
+```kubectl apply -f utility_cluster_yml```
+
 To deploy app cluster run:
 
 ```terraform workspace select app-cluster```
 
 ```terraform apply```
 
+```aws eks --region us-east-1  update-kubeconfig --name app-cluster-eks-cluster-dev```
+
+```kubectl apply -f app_cluster_yml```
 
 ## resources use:
 
