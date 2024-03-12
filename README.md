@@ -54,6 +54,6 @@ This is a multi AZ deployment of a java app, I have use two availability zones t
 
 ## Diagram
 
-this diagram is a representation of both clusters
+this diagram is a representation of both clusters sinse they are a replica of each other with some variations
 
 <img src="./images/eksClusterMERN.png" width="850"/>
