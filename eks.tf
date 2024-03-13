@@ -61,10 +61,7 @@ resource "aws_iam_role" "nodes_rol" {
   })
 }
 
-# resource "aws_iam_role_policy_attachment" "nodes-rds" {
-#   policy_arn = "arn:aws:iam::aws:policy/AmazonRDSDataFullAccess"
-#   role       = aws_iam_role.nodes_rol.name
-# }
+
 
 resource "aws_iam_role_policy_attachment" "nodes-AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
@@ -93,7 +90,6 @@ resource "aws_launch_template" "add_bridge" {
       cluster_name = aws_eks_cluster.eks-cluster.name
       endpoint     = aws_eks_cluster.eks-cluster.endpoint
       ca_cert      = aws_eks_cluster.eks-cluster.certificate_authority[0].data
-      bootstrap_extra_args = "--enable-docker-bridge"
     })
   )
 }
