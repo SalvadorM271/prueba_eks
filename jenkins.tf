@@ -94,6 +94,21 @@ resource "kubernetes_storage_class" "efs_jenkins" {
 #   }
 # }
 
+// config map for 
+
+resource "kubernetes_config_map" "docker_config" {
+  metadata {
+    name = "docker-config"
+  }
+
+  data = {
+    "config.json" = jsonencode({
+      "credsStore" = "ecr-login"
+    })
+  }
+}
+
+
 // dont forget to set the service type to NodePort in the values
 
 resource "helm_release" "jenkins" {
@@ -116,7 +131,8 @@ resource "helm_release" "jenkins" {
     kubernetes_storage_class.efs_jenkins[0],
     aws_efs_mount_target.efs_vol_a[0],
     aws_efs_mount_target.efs_vol_b[0],
-    aws_eks_node_group.private-nodes
+    aws_eks_node_group.private-nodes,
+    aws_iam_role_policy_attachment.nodes-ecr_access
   ]
   
 }

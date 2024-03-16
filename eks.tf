@@ -61,7 +61,31 @@ resource "aws_iam_role" "nodes_rol" {
   })
 }
 
+resource "aws_iam_policy" "ecr_access" {
+  name = "${var.project_name}-ecr-pol-${var.environment}"
 
+  policy = jsonencode({
+    Statement = [{
+      Action = [
+                "ecr:GetAuthorizationToken",
+                "ecr:InitiateLayerUpload",
+                "ecr:UploadLayerPart",
+                "ecr:CompleteLayerUpload",
+                "ecr:PutImage",
+                "ecr:BatchGetImage",
+                "ecr:BatchCheckLayerAvailability"
+            ]
+      Effect   = "Allow"
+      Resource = "*"
+    }]
+    Version = "2012-10-17"
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "nodes-ecr_access" {
+  policy_arn = aws_iam_policy.ecr_access.arn
+  role       = aws_iam_role.nodes_rol.name
+}
 
 resource "aws_iam_role_policy_attachment" "nodes-AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
