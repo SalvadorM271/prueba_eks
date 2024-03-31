@@ -8,7 +8,7 @@ data "aws_iam_policy_document" "external_dns_assume_role_policy" {
     condition { 
       test     = "StringEquals"
       variable = "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub" 
-      values   = ["system:serviceaccount:default:external-dns"] // namespace and service account
+      values   = ["system:serviceaccount:kube-system:external-dns"] // namespace and service account
     }
 
     principals {
@@ -41,7 +41,7 @@ resource "helm_release" "external_dns" {
   chart      = "external-dns"
   version    = "6.28.1"
 
-  namespace = "default"
+  namespace = "kube-system"
 
   set {
     name = "provider"

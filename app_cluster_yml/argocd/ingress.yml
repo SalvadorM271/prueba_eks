@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd-ingress
+  namespace: argo-cd-dev
+  annotations:
+    # kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:438555236323:certificate/782198c5-e64d-4dbc-81c5-79e7bac59bcb
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-2016-08
+    alb.ingress.kubernetes.io/backend-protocol: HTTPS
+    alb.ingress.kubernetes.io/healthcheck-path: /login
+    # alb.ingress.kubernetes.io/target-type: 'ip'
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80,"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+  finalizers:
+    - ingress.k8s.aws/resources
+  labels:
+    app: argocd-ingress
+spec:
+  ingressClassName: argo-ingress-class # Ingress Class
+  rules:
+    - host: argocd.mycloudprojects.uk 
+      http:
+        paths:
+          - path: /
+            backend:
+              service:
+                name: app-cluster-argo-cd-dev-argocd-server
+                port:
+                  number: 443
+            pathType: Prefix
+      

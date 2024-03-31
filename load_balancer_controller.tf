@@ -8,7 +8,7 @@ data "aws_iam_policy_document" "aws_load_balancer_controller_assume_role_policy"
     condition { 
       test     = "StringEquals"
       variable = "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub" 
-      values   = ["system:serviceaccount:default:${var.project_name}-alb-controller-sa-${var.environment}"] // service acc name and namespace
+      values   = ["system:serviceaccount:kube-system:${var.project_name}-alb-controller-sa-${var.environment}"] // service acc name and namespace
     }
 
     principals {
@@ -69,7 +69,7 @@ resource "helm_release" "aws-load-balancer-controller" {
 
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
-  namespace  = "default"
+  namespace  = "kube-system"
   version    = "1.4.1"
 
   set {
