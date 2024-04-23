@@ -22,6 +22,6 @@ resource "helm_release" "kube-prometheus-stack-chart" {
   # you can check the generated ingress with kubectl get ingress createdIngressName -n namespaceName -oyaml
   # to get the ingress name use kubectl get ingress -n prometheus-stack
 
-  depends_on = [aws_eks_node_group.private-nodes, helm_release.external_dns]
+  depends_on = [aws_eks_node_group.private-nodes, helm_release.external_dns, kubernetes_ingress_class.example]
 
 }
