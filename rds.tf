@@ -48,7 +48,7 @@ resource "aws_db_instance" "rds" {
   identifier              = "sonardb1" // name chage broke app
   db_name                 = "sonardb"
   engine                  = "postgres"
-  engine_version          = "14.6"
+  engine_version          = "15"
   instance_class          = var.rds_instance // db.t2.micro
   allocated_storage       = 20
   storage_type            = var.rds_storage_type // gp2

@@ -22,7 +22,7 @@ metadata:
     # External DNS - For creating a Record Set in Route53 to change this you need to change frontend route to same
     external-dns.alpha.kubernetes.io/hostname: jenkins.mycloudprojects.uk, sonar.mycloudprojects.uk
 spec:
-  ingressClassName: my-aws-ingress-class # Ingress Class
+  ingressClassName: my-aws-ingress-class-dev # Ingress Class
   rules:
   - host: jenkins.mycloudprojects.uk
     http:
